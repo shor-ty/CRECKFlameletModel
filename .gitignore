@@ -1,0 +1,15 @@
+#vim swap and gedit
+*~
+*swp
+
+#FOAM files
+dependencies
+dependencyFiles  
+dontIncludeDeps  
+files  
+filesMacros  
+includeDeps  
+*.o  
+localObjectFiles  
+objectFiles   
+sourceFiles
