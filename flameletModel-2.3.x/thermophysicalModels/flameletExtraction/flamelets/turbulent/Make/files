@@ -1,0 +1,6 @@
+src/OpenSMOKE_PDF_NonAdiabaticFlamelet_Library.cpp
+src/OpenSMOKE_PDF_Flamelet_Library.cpp
+src/OpenSMOKE_PDF_Flamelet.cpp
+
+LIB = $(FOAM_USER_LIBBIN)/libOpenSMOKE_turbulent_flamelets
+

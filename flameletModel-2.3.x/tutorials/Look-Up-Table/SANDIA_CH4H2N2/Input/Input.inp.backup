@@ -1,0 +1,17 @@
+// ----------------------------------------------------	//
+//		LookUpTable				//
+// ----------------------------------------------------	//
+
+	#Pdf BETA
+	
+	#ListOfFlamelets	
+
+	
+	#FlameletLibrary	PDF-0.fla
+	#LookUpTable		PDF-0.lib
+	#LookUpTableOpenFOAM	PDF-0
+	
+	#NumberOfVariances	30
+	#StretchingFactor	1.17 
+
+#END
