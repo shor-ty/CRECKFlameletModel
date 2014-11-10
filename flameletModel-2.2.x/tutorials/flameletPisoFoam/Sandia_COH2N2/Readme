@@ -1,0 +1,5 @@
+To start the solver:
+
+1. blockMesh
+2. flameletPisoFoam
+3. paraFoam

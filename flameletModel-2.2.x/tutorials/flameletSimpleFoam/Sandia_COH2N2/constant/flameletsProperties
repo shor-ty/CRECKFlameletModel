@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.2;
+    format      binary;
+    class       dictionary;
+    location    "constant";
+    object      flameletsProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+	//- Path to flamelet library
+	libraryPath			"PDF-Library";
+
+	//- Output modes
+	showFlamelet			off;
+	showFlameletLibrary		off;
+	
+	//- Show Z, Zvar and H (min/max) 
+	monitoring			off;
+
+	//- Adiabatic mode
+	adiabaticMode			off;				
+
+	//- Radiation model (only for free stream flames)
+	radiationMode			on;
+
+		//- Environment temperature
+		Tenv			Tenv		[0 0  0 1 0 0 0]   292.15;
+
+	//- Algebraic eqn. for mixture fraction variance
+	varianceEquation 		off;
+
+	//- LookUpTable extraction after <n> iterations
+		
+		//- Thermo variables
+		propertyUpdate			5;
+
+		//- mass fraction
+		massFractionsUpdate		50;	
+
+	//- Species that are saved for paraview
+	species				"CO H2 H2O O2 N2 CO2 OH";
+
+	//- Scalar Dissipation Rate PDF
+		
+		//- Kind of calculation (dirac|logNormal)
+		pdf 		"dirac";		
+
+		//- Options for logNormal	
+		//- Splitting Zvar with expanson factor
+		sigma		1.31;
+
+		//- Integration intervals (Z)
+		points		50;
+
+	//- Equation constants
+	sigmat 		0.85;
+	Cg		2.86;
+	Cd		2.00;
+	Cx		2.00;
+	
+
+	//- Turbulence: k-e model
+	k_small			k_small 	[0 2 -2 0 0 0 0]   1.e-6;
+	epsilon_small		epsilon_small 	[0 2 -3 0 0 0 0]   1.e-6;
+	
+// ************************************************************************* //
+
