@@ -1,0 +1,42 @@
+// -------------------------------------------------------------------- //
+// 				Flamelet				//	
+// -------------------------------------------------------------------- //
+
+	#Fuel		CO
+	#Oxidizer 	O2
+	#Inert		N2 
+
+	#Points			250
+
+	#Pressure		1 atm
+
+	#FuelTemperature	292.15 K
+	#FuelMoleFractions	CO 0.4
+				N2 0.3
+				H2 0.3
+					
+ 
+	#OxidizerTemperature	290.15 K
+	#OxidizerMoleFractions	O2  0.20750980
+				N2  0.78063240
+				H2O 0.00118577			
+
+	#FlameTemperature	2200. K
+	#FlamePosition		0.90
+
+	#OutputSpecies		ALL
+	
+	#ScalarDissipationRates	1.e-6 1e−5 1e−4 1e−3 1e−2 1e−1 1 2 3 5 8 10 20 30 50 75 100 150 200 300 400 500 800 Hz
+
+
+	#EnthalpyDefect		 0   kJ/kg
+	#MinimumTemperature	 290 K
+
+	#RelativeTolerance	1.e5
+
+	#GridRefineGradient		4
+	#GridRefineCurvature		4
+	#GridRefineGradientStep      	0.05
+	#GridRefineCurvatureStep 	0.05
+
+#END

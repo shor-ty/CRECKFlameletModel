@@ -1,0 +1,20 @@
+EXE_INC = \
+    -I$(WM_PROJECT_USER_DIR)/flameletModel/libraries/common/lnInclude \
+    -I$(WM_PROJECT_USER_DIR)/flameletModel/libraries/flamelets/turbulent/lnInclude \
+    -I$(WM_PROJECT_USER_DIR)/flameletModel/libraries/pdfThermo/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels \
+    -I$(LIB_SRC)/turbulenceModels/compressible/RAS/RASModel \
+    -I$(LIB_SRC)/finiteVolume/cfdTools \
+    -I$(LIB_SRC)/finiteVolume/lnInclude
+
+EXE_LIBS = \
+    -L$(FOAM_USER_LIBBIN) \
+    -lOpenSMOKE_pdfThermo \
+    -lOpenSMOKE_common \
+    -lOpenSMOKE_turbulent_flamelets \
+    -lbasicThermophysicalModels \
+    -lspecie \
+    -lcompressibleRASModels \
+    -lfiniteVolume \
+    -lmeshTools

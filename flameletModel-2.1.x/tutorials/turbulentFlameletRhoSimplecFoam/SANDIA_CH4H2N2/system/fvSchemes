@@ -1,0 +1,77 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default steadyState;
+}
+
+gradSchemes
+{
+    default         none;
+	
+    grad(p)         cellLimited Gauss linear 1;
+    grad(U)         cellLimited Gauss linear 1;
+    grad(csi)       cellLimited Gauss linear 1;    
+    grad(csiv2)     cellLimited Gauss linear 1; 
+    grad(H)	    cellLimited Gauss linear 1; 
+    grad(epsilon)   cellLimited Gauss linear 1;  
+    grad(k)	    cellLimited Gauss linear 1;      
+}
+
+divSchemes
+{
+    default          none;
+
+    div(phi,U)      			Gauss limitedLinearV 1; //	Gauss limitedLinearV 1;
+    div(phiU,p)     			Gauss limitedLinear 1; //	Gauss limitedLinear 1;
+    div(phi,epsilon) 			Gauss limitedLinear 1;
+    div(phi,k) 				Gauss limitedLinear 1;
+    div(phi,H) 				Gauss limitedLinear 1;
+    div(phi,csi)   			Gauss limitedLimitedLinear 1 0 1;
+    div(phi,csiv2)  			Gauss limitedLimitedLinear 1 0 0.25;
+    div((muEff*dev2(T(grad(U)))))       Gauss linear;
+}
+
+laplacianSchemes
+{
+    default                 		none;
+
+    laplacian(muEff,U)			Gauss linear corrected; 
+    laplacian((muEff|sigmat),csi)   	Gauss linear corrected;     
+    laplacian((mut|sigmat),csiv2) 	Gauss linear corrected;   
+    laplacian((rho|A(U)),p)     	Gauss linear corrected;   
+    laplacian(DepsilonEff,epsilon)  	Gauss linear corrected;
+    laplacian(DkEff,k)              	Gauss linear corrected;
+    laplacian((muEff|sigmat),H)		Gauss linear corrected; 
+    laplacian((rho|(A(U)-H(1))),p)      Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default                 none;
+    interpolate(rho)        linear;
+    interpolate((rho*U))    linear;
+    interpolate(((rho|(A(U)-H(1)))-(rho|A(U)))) linear;
+}
+
+fluxRequired
+{
+    p;
+}
+
+// ************************************************************************* //

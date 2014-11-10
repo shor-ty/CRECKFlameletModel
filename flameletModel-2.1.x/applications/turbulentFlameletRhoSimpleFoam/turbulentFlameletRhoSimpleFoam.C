@@ -1,0 +1,98 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Application
+    rhoSimpleFoam
+
+Description
+    Steady-state solver for turbulent flow of compressible fluids
+
+\*---------------------------------------------------------------------------*/
+#include "fvCFD.H"
+#include "basicPdfThermo.H"
+#include "hPdfThermo.H"
+#include "RASModel.H"
+#include "fixedGradientFvPatchFields.H"
+#include "simpleControl.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+int main(int argc, char *argv[])
+{
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "readGravitationalAcceleration.H"
+#   include "createFields.H"
+#   include "initContinuityErrs.H"
+#   include "readMassFlowProperties.H"
+
+    simpleControl simple(mesh);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    Info<< "\nStarting time loop\n" << endl;
+
+    while (simple.loop())
+    {
+        Info<< "Time = " << runTime.timeName() << nl << endl;
+
+        p.storePrevIter();
+        rho.storePrevIter();
+
+        // Pressure-velocity SIMPLE corrector
+        {
+#           include "UEqn.H"
+#           include "hEqn.H"
+#           include "csiEqn.H"
+#           include "pEqn.H"
+        }
+
+        turbulence->correct();
+ 
+        rho = thermo.rho();
+
+        runTime.write();
+#       include "writeMassFlow.H"
+
+
+	Info<< "- - - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+	Info<< "rho   min|max: \t" << min(rho).value() << "\t" << max(rho).value() << endl;
+	Info<< "csi   min|max: \t" << min(csi).value() << "\t\t" << max(csi).value() << endl;
+	Info<< "csiv  min|max: \t" << min(csiv2).value() << "\t\t" << max(csiv2).value() << endl;
+	Info<< "H     min|max: \t" << min(H).value() << "\t" << max(H).value() << endl;
+	Info<< "- - - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
+    }
+
+    Info<< "End\n" << endl;
+
+    return 0;
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,30 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+
+./Allclean
+
+ideasUnvToFoam blockMesh.unv
+
+surfaceFeatureExtract -includedAngle 110 constant/triSurface/chamber.stl chamber
+
+snappyHexMesh -overwrite
+
+createPatch -overwrite
+
+mkdir 0 -v
+
+cp 0.org/* 0/
+
+decomposePar
+
+echo "Calculating..." 
+
+mpirun -np 4 turbulentFlameletRhoSimplecFoam -parallel > log 
+
+reconstructPar 
+
+rm -r pro* 
+
+touch paraview.foam
+

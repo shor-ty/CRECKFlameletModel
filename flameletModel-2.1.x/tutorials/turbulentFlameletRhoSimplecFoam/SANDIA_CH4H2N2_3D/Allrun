@@ -1,0 +1,32 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+
+./Allclean
+
+ideasUnvToFoam blockMesh.unv
+
+surfaceFeatureExtract -includedAngle 110 constant/triSurface/sandia.stl sandia
+
+snappyHexMesh -overwrite
+
+changeDictionary 
+
+createPatch -overwrite
+
+mkdir 0 -v
+
+cp 0.org/* 0/
+
+decomposePar
+
+echo "Calculating..." 
+
+mpirun -np 8 turbulentFlameletRhoSimplecFoam -parallel > log 
+
+reconstructPar 
+
+rm -r pro* 
+
+touch paraview.foam
+

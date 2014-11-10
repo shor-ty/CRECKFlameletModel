@@ -1,0 +1,118 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    U
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-07;
+        relTol          0.1;
+    }
+
+    p
+    {
+        solver           GAMG;
+        tolerance        1e-8;
+        relTol           0.001;
+
+        smoother         GaussSeidel;
+
+        cacheAgglomeration  true;
+        nCellsInCoarsestLevel 10;
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    }
+
+    csi
+    {
+	solver		 PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-07;
+        relTol           0.1;
+    }
+
+    csiv2
+    {
+	solver		 PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-07;
+        relTol           0.1;
+    }
+
+    H
+    {
+	solver		 PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-07;
+        relTol           0.1;
+    }
+
+    k
+    {
+	solver		 PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-07;
+        relTol           0.01;
+    }
+
+    epsilon 
+    {
+	solver		 PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-07;
+        relTol           0.01;
+    }
+
+}
+
+
+SIMPLE
+{
+    	nNonOrthogonalCorrectors 0;
+	pMin pMin [1 -1 -2 0 0 0 0]   100;
+
+        rhoMin rhoMin [1 -3 0 0 0 0 0] 0.1;
+	rhoMax rhoMax [1 -3 0 0 0 0 0] 2;
+
+	residualControl
+	{
+		p	5e-5;
+		csi	1e-5;
+		H	1e-5;
+	}
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p               0.4;
+    }
+    equations
+    {
+        U               0.4;
+        k               0.3;
+        epsilon         0.3;
+        H               0.4;
+        csi             0.4;
+        csiv2           0.1;
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+
+cd common
+wmake libso
+cd ../flamelets/turbulent
+wmake libso
+cd ../../pdfThermo
+wmake libso

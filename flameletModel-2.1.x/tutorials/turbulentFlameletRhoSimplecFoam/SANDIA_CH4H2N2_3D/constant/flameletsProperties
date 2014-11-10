@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       dictionary;
+    location    "constant";
+    object      flameletsProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+	//Flamelet Library
+	libraryPath			"PDF-Library";				// path to the flamelet library
+	adiabaticMode			off;					// on = adiabatic calculations
+	radiationMode			on;					// Radiation mode on/off
+	varianceEquation 		on;					// off = variance of csi with an algebraic expression
+	propertyUpdate			5;					// number of iterations to update the look-up table
+	massFractionsUpdate		1000;					// number of iterations to update mass fractions
+	species				"CH4 CO H2 H2O O2 N2 CO2 OH ";		// list of species to plot in paraFoam
+
+	//Scalar Dissipation Rate PDF
+	pdf 		"dirac";			// kind of PDF: dirac || logNormal
+	sigma		1.31;				// variance of PDF (only in case of logNormal PDF)
+	points		50;				// number of integration intervals (only in case of logNormal PDF)
+
+	// Equation constants
+	sigmat 		0.85;
+	Cg		2.86;
+	Cd		2.00;
+	Cx		2.00;
+	
+	// Environment temperature
+	Tenv			Tenv		[0 0  0 1 0 0 0]   292.15;
+
+	// Turbulence: k-e model
+	k_small			k_small 	[0 2 -2 0 0 0 0]   1.e-6;
+	epsilon_small		epsilon_small 	[0 2 -3 0 0 0 0]   1.e-6;
+	
+// ************************************************************************* //
+

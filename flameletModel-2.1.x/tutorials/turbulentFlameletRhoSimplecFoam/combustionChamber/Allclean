@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+
+echo "Clearing case"
+rm -r 0 outInfo.case log* 1* 2* 3* 4* 5* 6* 7* 8* 9* constant/polyMesh constant/extended* constant/triSurface/*.eMesh pro* -f 

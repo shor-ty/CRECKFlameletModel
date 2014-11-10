@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+
+cd common
+wclean
+cd ../flamelets/turbulent
+wclean
+cd ../../pdfThermo
+wclean

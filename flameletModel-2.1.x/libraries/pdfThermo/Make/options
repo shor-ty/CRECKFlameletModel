@@ -1,0 +1,9 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(realpath ../common/lnInclude) \
+    -I$(realpath ../flamelets/turbulent/lnInclude) 
+
+LIB_LIBS = \
+    -lfiniteVolume
