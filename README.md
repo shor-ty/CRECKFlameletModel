@@ -7,6 +7,7 @@ This README  includes the steps which are necessary to get this application up a
 ** 2.1.x **
 ** 2.2.x **
 ** 2.3.x **
+** 4.x **
 
 ### What is this repository for? ###
 * This model contains the thermodynamic flamelet model and a binary file for building Look-Up-Tables for the model
@@ -47,6 +48,8 @@ This README  includes the steps which are necessary to get this application up a
 > git checkout flameletModel-2.2.x
 * for version 2.3.x use the following command
 > git checkout flameletModel-2.3.x
+* for version 4.x use the following command
+> git checkout flameletModel-4.x
 * After that pull it
 > git pull
 * Now you have your libraries available and you can start compiling
