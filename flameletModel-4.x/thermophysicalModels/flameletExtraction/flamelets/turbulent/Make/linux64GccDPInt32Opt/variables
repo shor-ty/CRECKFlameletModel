@@ -1,0 +1,1 @@
+LIB = $(FOAM_USER_LIBBIN)/libOpenSMOKE_turbulent_flamelets

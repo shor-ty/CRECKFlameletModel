@@ -1,0 +1,2 @@
+Common = src
+LIB = $(FOAM_USER_LIBBIN)/libOpenSMOKE_common

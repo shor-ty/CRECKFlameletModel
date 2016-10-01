@@ -1,0 +1,6 @@
+$(OBJECTS_DIR)/src/OpenSMOKE_ChiDistribution.C.dep: \
+src/OpenSMOKE_ChiDistribution.C \
+src/OpenSMOKE_ChiDistribution.H \
+src/OpenSMOKE_External_Functions.H \
+
+

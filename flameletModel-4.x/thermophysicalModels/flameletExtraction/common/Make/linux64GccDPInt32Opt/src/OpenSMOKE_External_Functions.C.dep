@@ -1,0 +1,5 @@
+$(OBJECTS_DIR)/src/OpenSMOKE_External_Functions.C.dep: \
+src/OpenSMOKE_External_Functions.C \
+src/OpenSMOKE_External_Functions.H \
+
+

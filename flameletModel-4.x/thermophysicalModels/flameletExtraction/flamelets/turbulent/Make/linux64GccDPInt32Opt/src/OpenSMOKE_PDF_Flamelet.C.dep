@@ -1,0 +1,5 @@
+$(OBJECTS_DIR)/src/OpenSMOKE_PDF_Flamelet.C.dep: \
+src/OpenSMOKE_PDF_Flamelet.C \
+src/OpenSMOKE_PDF_Flamelet.H \
+
+
