@@ -1,9 +1,0 @@
-$(OBJECTS_DIR)/src/OpenSMOKE_PDF_NonAdiabaticFlamelet_Library.C.dep: \
-src/OpenSMOKE_PDF_NonAdiabaticFlamelet_Library.C \
-src/OpenSMOKE_PDF_NonAdiabaticFlamelet_Library.H \
-src/OpenSMOKE_PDF_Flamelet.H \
-src/OpenSMOKE_PDF_Flamelet_Library.H \
-/home/shor-ty/OpenFOAM/shor-ty-4.x/flameletmodel/flameletModel-4.x/thermophysicalModels/flameletExtraction/common/lnInclude/OpenSMOKE_ChiDistribution.H \
-/home/shor-ty/OpenFOAM/shor-ty-4.x/flameletmodel/flameletModel-4.x/thermophysicalModels/flameletExtraction/common/lnInclude/OpenSMOKE_External_Functions.H \
-
-
