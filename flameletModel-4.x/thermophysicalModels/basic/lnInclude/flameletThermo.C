@@ -1,1 +1,0 @@
-../flameletThermo/flameletThermo.C
