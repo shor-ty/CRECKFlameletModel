@@ -1,1 +1,0 @@
-../src/OpenSMOKE_External_Functions.C
