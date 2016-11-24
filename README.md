@@ -4,10 +4,10 @@ This README  includes the steps which are necessary to get this application up a
 
 ### OpenFOAM Versions ###
 * Generated for version 
-** 2.1.x **
-** 2.2.x **
-** 2.3.x **
-** 4.x **
+* * 2.1.x 
+* * 2.2.x 
+* * 2.3.x 
+* * 4.x 
 
 ### What is this repository for? ###
 * This model contains the thermodynamic flamelet model and a binary file for building Look-Up-Tables for the model
