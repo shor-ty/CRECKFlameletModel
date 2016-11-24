@@ -122,6 +122,39 @@ public:
 
     // Member functions
 
+        //- Fields comming with pdfThermo
+
+            //- Mixture fraction [-] non-const
+            virtual volScalarField& Z();
+
+            //- Mixture fraction [-] const
+            virtual const volScalarField& Z() const;
+
+            //- Varianz of mixture fraction [-] non-const
+            virtual volScalarField& Zvar();
+
+            //- Varianz of mixture fraction [-] const
+            virtual const volScalarField& Zvar() const;
+
+            //- Stochiometric mixture fraction [1/s] non-const
+            virtual volScalarField& chi_st();
+
+            //- Stochiometric mixture fraction [1/s] const
+            virtual const volScalarField& chi_st() const;
+
+            //- Enhalpy [J/kg] non-const
+            virtual volScalarField& H();
+
+            //- Enhalpy [J/kg] const
+            virtual const volScalarField& H() const;
+
+            //- Mean absorbtion coefficient [1/m] non-const
+            virtual volScalarField& as();
+
+            //- Mean absorbtion coefficient [1/m] const
+            virtual const volScalarField& as() const;
+
+
         // Fields derived from thermodynamic state variables
 
             //- Density [kg/m^3]

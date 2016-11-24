@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,36 +22,38 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    rhoSimpleFoam
+    flameletSimpleFoam
 
 Description
-    Steady-state SIMPLE solver for laminar or turbulent RANS flow of
-    compressible fluids.
+    Steady-state solver for turbulent flow using the flamelet theory for the
+    thermodynamics.
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "flameletThermo.H"
-#include "RASModel.H"
+#include "turbulentFluidThermoModel.H"
 #include "simpleControl.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-    #include "readMassFlowProperties.H"
-    #include "readGravitationalAcceleration.H"
-
-    simpleControl simple(mesh);
-
+    #include "createControl.H"
     #include "createFields.H"
+    #include "createFieldRefs.H"
+    #include "readMassFlowProperties.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,19 +64,25 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         // Pressure-velocity SIMPLE corrector
+        #include "UEqn.H"
+        #include "ZEqn.H"
+        #include "HEqn.H"
+
+        if (simple.consistent())
         {
-            #include "UEqn.H"
+            #include "pcEqn.H"
+        }
+        else
+        {
             #include "pEqn.H"
-			#include "ZEqn.H"
-			#include "HEqn.H"
         }
 
         turbulence->correct();
 
         runTime.write();
 
-		#include "writeMassFlow.H"
-		#include "outputVariables.H"
+        #include "writeMassFlow.H"
+        //#include "outputVariables.H"
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

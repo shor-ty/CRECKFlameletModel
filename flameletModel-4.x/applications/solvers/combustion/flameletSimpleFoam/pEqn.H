@@ -1,57 +1,104 @@
 {
-//- Modifyed for flamelet
+    volScalarField rAU(1.0/UEqn.A());
+    surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
+    volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
+    tUEqn.clear();
 
-//- Equation from libOpenSmoke
+    bool closedVolume = false;
 
-rho = thermo.rho();
-rho = max(rho, rhoMin);
-rho = min(rho, rhoMax);
+    if (simple.transonic())
+    {
+        surfaceScalarField phid
+        (
+            "phid",
+            fvc::interpolate(psi)
+           *fvc::flux(HbyA)
+        );
 
-volScalarField AU = UEqn().A();
-U = UEqn().H()/AU;
-UEqn.clear();
-phi = fvc::interpolate(rho*U) & mesh.Sf();
-bool closedVolume = adjustPhi(phi, U, p);
+        MRF.makeRelative(fvc::interpolate(psi), phid);
 
-for (int nonOrth=0; nonOrth<=simple.nNonOrthCorr(); nonOrth++)
-{
-	fvScalarMatrix pEqn
-	(
-	     fvm::laplacian(rho/AU, p) == fvc::div(phi)
-	);
+        while (simple.correctNonOrthogonal())
+        {
+            fvScalarMatrix pEqn
+            (
+                fvm::div(phid, p)
+              - fvm::laplacian(rhorAUf, p)
+              ==
+                fvOptions(psi, p, rho.name())
+            );
 
-	pEqn.setReference(pRefCell, pRefValue);
+            // Relax the pressure equation to ensure diagonal-dominance
+            pEqn.relax();
 
-	pEqn.solve();
+            pEqn.setReference(pRefCell, pRefValue);
 
-	if (nonOrth == simple.nNonOrthCorr())
-	{
-	    phi -= pEqn.flux();
-	}
-}
+            pEqn.solve();
 
-#include "incompressible/continuityErrs.H"
+            if (simple.finalNonOrthogonalIter())
+            {
+                phi == pEqn.flux();
+            }
+        }
+    }
+    else
+    {
+        surfaceScalarField phiHbyA("phiHbyA", fvc::flux(rho*HbyA));
+        MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
 
-// Explicitly relax pressure for momentum corrector
-p.relax();
+        closedVolume = adjustPhi(phiHbyA, U, p);
 
-U -= fvc::grad(p)/AU;
-U.correctBoundaryConditions();
+        // Update the pressure BCs to ensure flux consistency
+        constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
 
-bound(p, pMin);
+        while (simple.correctNonOrthogonal())
+        {
+            fvScalarMatrix pEqn
+            (
+                fvc::div(phiHbyA)
+              - fvm::laplacian(rhorAUf, p)
+              ==
+                fvOptions(psi, p, rho.name())
+            );
 
-// For closed-volume cases adjust the pressure and density levels
-// to obey overall mass continuity
-if (closedVolume)
-{
-	p += (initialMass - fvc::domainIntegrate(thermo.psi()*p))/fvc::domainIntegrate(thermo.psi());
-}
+            pEqn.setReference(pRefCell, pRefValue);
 
-rho = thermo.rho();
-rho.relax();
+            pEqn.solve();
 
-if(monitoring != true)
-{
-Info<< "rho max/min : " << max(rho).value() << " " << min(rho).value() << endl;
-}
+            if (simple.finalNonOrthogonalIter())
+            {
+                phi = phiHbyA + pEqn.flux();
+            }
+        }
+    }
+
+
+    #include "incompressible/continuityErrs.H"
+
+    // Explicitly relax pressure for momentum corrector
+    p.relax();
+
+    U = HbyA - rAU*fvc::grad(p);
+    U.correctBoundaryConditions();
+    fvOptions.correct(U);
+
+    // For closed-volume cases adjust the pressure and density levels
+    // to obey overall mass continuity
+    if (closedVolume)
+    {
+        p += (initialMass - fvc::domainIntegrate(psi*p))
+            /fvc::domainIntegrate(psi);
+    }
+
+    rho = thermo.rho();
+    rho = max(rho, rhoMin);
+    rho = min(rho, rhoMax);
+
+    if (!simple.transonic())
+    {
+        rho.relax();
+    }
+
+    Info<< "rho max/min : "
+        << max(rho).value() << " "
+        << min(rho).value() << endl;
 }

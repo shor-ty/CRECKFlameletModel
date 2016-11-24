@@ -155,6 +155,67 @@ Foam::flameletThermo::~flameletThermo()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+Foam::volScalarField& Foam::flameletThermo::Z()
+{
+    notImplemented("flameletThermo::Z()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+const Foam::volScalarField& Foam::flameletThermo::Z() const
+{
+    notImplemented("flameletThermo::Z() const");
+    return volScalarField::null();
+}
+
+Foam::volScalarField& Foam::flameletThermo::Zvar()
+{
+    notImplemented("flameletThermo::Zvar()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+const Foam::volScalarField& Foam::flameletThermo::Zvar() const
+{
+    notImplemented("flameletThermo::Zvar() const");
+    return volScalarField::null();
+}
+
+Foam::volScalarField& Foam::flameletThermo::chi_st()
+{
+    notImplemented("flameletThermo::chi_st()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+const Foam::volScalarField& Foam::flameletThermo::chi_st() const
+{
+    notImplemented("flameletThermo::chi_st() const");
+    return volScalarField::null();
+}
+
+Foam::volScalarField& Foam::flameletThermo::H()
+{
+    notImplemented("flameletThermo::H()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+const Foam::volScalarField& Foam::flameletThermo::H() const
+{
+    notImplemented("flameletThermo::H() const");
+    return volScalarField::null();
+}
+
+Foam::volScalarField& Foam::flameletThermo::as()
+{
+    notImplemented("flameletThermo::as()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+const Foam::volScalarField& Foam::flameletThermo::as() const
+{
+    notImplemented("flameletThermo::as() const");
+    return volScalarField::null();
+}
+
+
 Foam::tmp<Foam::volScalarField> Foam::flameletThermo::rho() const
 {
     return rho_;
