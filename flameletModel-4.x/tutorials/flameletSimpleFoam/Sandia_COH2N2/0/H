@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  4.x                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -23,29 +23,29 @@ boundaryField
 {
     inletfuel           
     {
-        type  		fixedValue;
-	value		uniform -2.19608e+06;
+        type          fixedValue;
+        value         uniform -2.19608e+06;
     }
 
     inletair           
     {
-        type  		fixedValue;
-	value		uniform -17992.9;
+        type          fixedValue;
+        value         uniform -17992.9;
     }
 
     outlet          
     {
-        type  		zeroGradient;
+        type          zeroGradient;
     }
 
     sidewall       
     {
-        type  		zeroGradient;
+        type          zeroGradient;
     }
 
     burnerwall
     {
-        type  		zeroGradient;
+        type          zeroGradient;
     }
 
     front

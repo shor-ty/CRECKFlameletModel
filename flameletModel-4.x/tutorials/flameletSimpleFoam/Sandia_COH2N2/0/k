@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  4.x                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -23,49 +23,47 @@ boundaryField
 {
     inletfuel
     {
-	type            turbulentIntensityKineticEnergyInlet;
-	intensity	0.2;
-	value           uniform 346.56;
-
+        type         turbulentIntensityKineticEnergyInlet;
+        intensity    0.2;
+        value        uniform 346.56;
     }
 
     inletair
     {   
-	type            turbulentIntensityKineticEnergyInlet;
-	intensity	0.05;
-	value		uniform 0.0021;
-       
+        type         turbulentIntensityKineticEnergyInlet;
+        intensity    0.05;
+        value        uniform 0.0021;
     }
 
     outlet
     {
-        type            zeroGradient;
+        type         zeroGradient;
     }
 
     axis
     {
-        type            empty;
+        type         empty;
     }
 
     sidewall
     {
-	type		zeroGradient;
+        type         zeroGradient;
     }
 
     burnerwall
     {
-        type            compressible::kqRWallFunction;
-	value		uniform 0.0021;
+        type         kqRWallFunction;
+        value        uniform 0.0021;
     }
 
     front
     {
-        type            wedge;
+        type         wedge;
     }
 
     back
     {
-        type            wedge;
+        type         wedge;
     }
 }
 

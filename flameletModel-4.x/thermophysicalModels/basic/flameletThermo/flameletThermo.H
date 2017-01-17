@@ -58,7 +58,7 @@ protected:
 
         //- Density field [kg/m^3]
         //  Named 'flameletThermo' to avoid (potential) conflict with solver density
-        volScalarField rho_;
+        //volScalarField rho_;
 
         //- Compressibility [s^2/m^2]
         volScalarField psi_;
@@ -100,12 +100,12 @@ public:
         );
 
         //- Construct from mesh, dictionary and phase name
-        flameletThermo
+        /*flameletThermo
         (
             const fvMesh&,
             const dictionary&,
             const word& phaseName
-        );
+        );*/
 
 
     //- Selector
@@ -154,17 +154,23 @@ public:
             //- Mean absorbtion coefficient [1/m] const
             virtual const volScalarField& as() const;
 
+            //- Mean absorbtion coefficient [1/m] non-const
+            virtual volScalarField& rho();
+
+            //- Mean absorbtion coefficient [1/m] const
+            virtual const volScalarField& rho() const;
+
 
         // Fields derived from thermodynamic state variables
 
             //- Density [kg/m^3]
-            virtual tmp<volScalarField> rho() const;
+            //virtual tmp<volScalarField> rho() const;
 
             //- Density for patch [kg/m^3]
-            virtual tmp<scalarField> rho(const label patchi) const;
+            //virtual tmp<scalarField> rho(const label patchi) const;
 
             //- Return non-const access to the local density field [kg/m^3]
-            virtual volScalarField& rho();
+            //virtual volScalarField& rho();
 
             //- Compressibility [s^2/m^2]
             virtual const volScalarField& psi() const;

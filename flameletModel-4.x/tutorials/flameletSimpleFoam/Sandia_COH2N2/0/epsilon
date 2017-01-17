@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  4.x                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -23,38 +23,37 @@ boundaryField
 {
     inletfuel
     {
-	type            compressible::turbulentMixingLengthDissipationRateInlet;
-	mixingLength	0.0003206;
+        type            turbulentMixingLengthDissipationRateInlet;
+        mixingLength    0.0003206;
         value           uniform 3.337e6;
     }
     
     inletair
     {
-	type		compressible::turbulentMixingLengthDissipationRateInlet;
-	mixingLength	0.021;
+        type            turbulentMixingLengthDissipationRateInlet;
+        mixingLength    0.021;
         value           uniform 0.00041;
-
     }
     
     outlet
     {
-        type            zeroGradient;
+        type        zeroGradient;
     }
     
     axis
     {
-        type            empty;
+        type         empty;
     }
     
     sidewall
     {
-        type 		zeroGradient;
+        type         zeroGradient;
     }
     
     burnerwall
     {
-        type            compressible::epsilonWallFunction;
-	value		uniform 0.00041;
+        type         epsilonWallFunction;
+        value        uniform 0.00041;
     }
     
     front

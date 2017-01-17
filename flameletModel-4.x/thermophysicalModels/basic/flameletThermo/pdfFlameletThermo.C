@@ -24,102 +24,989 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "pdfFlameletThermo.H"
+#include "Time.H"
+#include "fixedValueFvPatchFields.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class BasicPsiThermo, class MixtureType>
 void Foam::pdfFlameletThermo<BasicPsiThermo, MixtureType>::calculate()
 {
-    const scalarField& hCells = this->he();
-    const scalarField& pCells = this->p_;
+    const scalarField& pCells = this->p_.internalField();
 
-    scalarField& TCells = this->T_.primitiveFieldRef();
-    scalarField& psiCells = this->psi_.primitiveFieldRef();
-    scalarField& rhoCells = this->rho_.primitiveFieldRef();
-    scalarField& muCells = this->mu_.primitiveFieldRef();
-    scalarField& alphaCells = this->alpha_.primitiveFieldRef();
+    const scalarField& HCells = this->H_.internalField();
 
-    forAll(TCells, celli)
+    const scalarField& ZCells = this->Z_.internalField();
+
+    const scalarField& RhoReynolds = this->density_reynolds_.internalField();
+
+    const scalarField& muFavre = this->mu_favre_.internalField();
+
+    const scalarField& alphaFavre = this->alpha_favre_.internalField();
+
+    scalarField& psiCells = this->psi_.ref();
+
+    scalarField& muCells = this->mu_.ref();
+
+    scalarField& alphaCells = this->alpha_.ref();
+
+    scalarField& defectCells = this->defect_.ref();
+
+    forAll(ZCells, celli)
     {
-        const typename MixtureType::thermoType& mixture_ =
-            this->cellMixture(celli);
+        psiCells[celli] = RhoReynolds[celli]/pCells[celli];
 
-        TCells[celli] = mixture_.THE
-        (
-            hCells[celli],
-            pCells[celli],
-            TCells[celli]
-        );
+        muCells[celli] = muFavre[celli];
 
-        psiCells[celli] = mixture_.psi(pCells[celli], TCells[celli]);
-        rhoCells[celli] = mixture_.rho(pCells[celli], TCells[celli]);
+        alphaCells[celli] = alphaFavre[celli];
 
-        muCells[celli] = mixture_.mu(pCells[celli], TCells[celli]);
-        alphaCells[celli] = mixture_.alphah(pCells[celli], TCells[celli]);
+        defectCells[celli] = 
+            HCells[celli] - (HOxidizer+ZCells[celli]*(HFuel-HOxidizer));
     }
 
-    volScalarField::Boundary& pBf =
-        this->p_.boundaryFieldRef();
-
-    volScalarField::Boundary& TBf =
-        this->T_.boundaryFieldRef();
-
-    volScalarField::Boundary& psiBf =
-        this->psi_.boundaryFieldRef();
-
-    volScalarField::Boundary& rhoBf =
-        this->rho_.boundaryFieldRef();
-
-    volScalarField::Boundary& heBf =
-        this->he().boundaryFieldRef();
-
-    volScalarField::Boundary& muBf =
-        this->mu_.boundaryFieldRef();
-
-    volScalarField::Boundary& alphaBf =
-        this->alpha_.boundaryFieldRef();
-
+    // Boundaries
     forAll(this->T_.boundaryField(), patchi)
     {
-        fvPatchScalarField& pp = pBf[patchi];
-        fvPatchScalarField& pT = TBf[patchi];
-        fvPatchScalarField& ppsi = psiBf[patchi];
-        fvPatchScalarField& prho = rhoBf[patchi];
-        fvPatchScalarField& phe = heBf[patchi];
-        fvPatchScalarField& pmu = muBf[patchi];
-        fvPatchScalarField& palpha = alphaBf[patchi];
+        const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
+
+        const fvPatchScalarField& pH = this->H_.boundaryField()[patchi];
+
+        const fvPatchScalarField& pZ = this->Z_.boundaryField()[patchi];
+
+        const fvPatchScalarField& pRhoReynolds
+            = this->density_reynolds_.boundaryField()[patchi];
+
+        const fvPatchScalarField& pmuFavre
+            = this->mu_favre_.boundaryField()[patchi];
+
+        const fvPatchScalarField& palphaFavre
+            = this->alpha_favre_.boundaryField()[patchi];
+
+        fvPatchScalarField& pT = this->T_.boundaryFieldRef()[patchi];
+
+        fvPatchScalarField& ppsi = this->psi_.boundaryFieldRef()[patchi];
+
+        fvPatchScalarField& pdefect = this->defect_.boundaryFieldRef()[patchi];
+
+        fvPatchScalarField& pmu = this->mu_.boundaryFieldRef()[patchi];
+
+        fvPatchScalarField& palpha = this->alpha_.boundaryFieldRef()[patchi];
+
 
         if (pT.fixesValue())
         {
             forAll(pT, facei)
             {
-                const typename MixtureType::thermoType& mixture_ =
-                    this->patchFaceMixture(patchi, facei);
+                ppsi[facei] = pRhoReynolds[facei]/pp[facei];
 
-                phe[facei] = mixture_.HE(pp[facei], pT[facei]);
+                pmu[facei] = pmuFavre[facei];
 
-                ppsi[facei] = mixture_.psi(pp[facei], pT[facei]);
-                prho[facei] = mixture_.rho(pp[facei], pT[facei]);
-                pmu[facei] = mixture_.mu(pp[facei], pT[facei]);
-                palpha[facei] = mixture_.alphah(pp[facei], pT[facei]);
+                palpha[facei] = palphaFavre[facei];
+
+                pdefect[facei]
+                    = pH[facei] - (HOxidizer+pZ[facei]*(HFuel-HOxidizer));
             }
         }
         else
         {
             forAll(pT, facei)
             {
-                const typename MixtureType::thermoType& mixture_ =
-                    this->patchFaceMixture(patchi, facei);
 
-                pT[facei] = mixture_.THE(phe[facei], pp[facei], pT[facei]);
+                ppsi[facei] = pRhoReynolds[facei]/pp[facei];
 
-                ppsi[facei] = mixture_.psi(pp[facei], pT[facei]);
-                prho[facei] = mixture_.rho(pp[facei], pT[facei]);
-                pmu[facei] = mixture_.mu(pp[facei], pT[facei]);
-                palpha[facei] = mixture_.alphah(pp[facei], pT[facei]);
+                pmu[facei] = pmuFavre[facei];
+
+                palpha[facei] = palphaFavre[facei];
+
+                pdefect[facei]
+                    = pH[facei] - (HOxidizer+pZ[facei]*(HFuel-HOxidizer));
             }
         }
     }
+}
+
+
+template<class BasicFlameletThermo, class MixtureType>
+void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::update()
+{
+    std::vector<scalar> extracted(7);
+
+    scalar Zvar_normalized = 0.;
+
+    scalar defect = 0.;
+
+    const scalarField& Z = this->Z_.internalField();
+
+    const scalarField& Zvar = this->Zvar_.internalField();
+
+    const scalarField& chi_st = this->chi_st_.internalField();
+
+    const scalarField& HCells = this->H_.internalField();
+
+    scalarField& TCells = this->T_.ref();
+
+    scalarField& RhoCells = this->density_reynolds_.ref();
+
+    scalarField& asCells = this->as_.ref();
+
+    scalarField& muCells = this->mu_favre_.ref();
+    
+    scalarField& alphaCells = this->alpha_favre_.ref();
+
+    scalar small_eps = 1.e-6;
+
+    scalar small_chi_st = 1.e-8;
+
+    //- Internal cells
+    forAll(Z, celli)
+    {
+        double max_chi = max(small_chi_st,chi_st[celli]);
+
+        if (adiabaticMode == false)
+        {
+            defect = HCells[celli] - (HOxidizer+Z[celli]*(HFuel-HOxidizer));
+        }
+
+        //- Pure oxidizer
+        if (Z[celli]<=small_eps)
+        {
+            flamelets_library.GetMeanValues
+            (
+                0.,
+                0.,
+                max_chi,
+                defect,
+                extracted
+            );
+        }
+
+        //- Pure fuel
+        else if (Z[celli]>=(1.-small_eps))
+        {
+            flamelets_library.GetMeanValues
+            (
+                1.,
+                0.,
+                max_chi,
+                defect,
+                extracted
+            );
+        }
+
+        //- Mixture
+        else
+        {
+            Zvar_normalized = Zvar[celli] / (Z[celli]*(1.-Z[celli]));
+
+            if (Zvar_normalized >= 0.98)
+            {
+                flamelets_library.GetMeanValues
+                (
+                    Z[celli],
+                    0.98,
+                    max_chi,
+                    defect,
+                    extracted
+                );
+            }
+            else if (Zvar_normalized < 0.)
+            {
+                flamelets_library.GetMeanValues
+                (
+                    Z[celli],
+                    0.00,
+                    max_chi,
+                    defect,
+                    extracted
+                );
+            }
+            else
+            {
+                flamelets_library.GetMeanValues
+                (
+                    Z[celli],
+                    Zvar_normalized,
+                    max_chi,
+                    defect,
+                    extracted
+                );
+            }
+        }
+
+        TCells[celli] = extracted[1];
+
+        RhoCells[celli] = extracted[2];
+
+        asCells[celli] = extracted[3];
+
+        muCells[celli] = extracted[4];
+
+        alphaCells[celli] = extracted[5];
+    }
+
+    //- Boundary conditions
+    if (adiabaticMode == true)
+    {
+        forAll(Z_.boundaryField(), patchi)
+        {
+            const fvPatchScalarField& pcsi =
+                this->Z_.boundaryField()[patchi];
+            
+            const fvPatchScalarField& pcsiv2 =
+                this->Zvar_.boundaryField()[patchi];
+
+            const fvPatchScalarField& pchi_st =
+                this->chi_st_.boundaryField()[patchi];
+
+            fvPatchScalarField& pmu =
+                this->mu_favre_.boundaryFieldRef()[patchi];
+
+            fvPatchScalarField& palpha =
+                this->alpha_favre_.boundaryFieldRef()[patchi];
+
+            fvPatchScalarField& prho =
+                this->density_reynolds_.boundaryFieldRef()[patchi];
+
+            fvPatchScalarField& pt = this->T_.boundaryFieldRef()[patchi];
+
+            fvPatchScalarField& pas = this->as_.boundaryFieldRef()[patchi];
+
+            forAll(pcsi, facei)
+            {
+
+                double max_chi = max(small_chi_st, pchi_st[facei]);
+
+                //- Pure oxidizer
+                if (pcsi[facei]<=0.)
+                {
+                    flamelets_library.GetMeanValues
+                    (
+                        0.,
+                        0.,
+                        max_chi,
+                        defect,
+                        extracted
+                    );
+                }
+
+                //- Pure fuel
+                else if (pcsi[facei]>=1.)
+                {
+                    flamelets_library.GetMeanValues
+                    (
+                        1.,
+                        0.,
+                        max_chi,
+                        defect,
+                        extracted
+                    );
+                }
+
+                //- Mixture
+                else
+                {
+                    Zvar_normalized =
+                        pcsiv2[facei] / (pcsi[facei]*(1.-pcsi[facei]));
+
+                    if (Zvar_normalized >= 0.98)
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            pcsi[facei],
+                            0.98,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+                    else if (Zvar_normalized < 0.)
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            pcsi[facei],
+                            0.00,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+                    else
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            pcsi[facei],
+                            Zvar_normalized,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+                }
+
+                pt[facei] = extracted[1];
+
+                prho[facei] = extracted[2];
+
+                pas[facei] = extracted[3];
+
+                pmu[facei] = extracted[4];
+
+                palpha[facei] = extracted[5];
+
+            }
+        }
+    }
+    else
+    {
+        forAll(Z_.boundaryField(), patchi)
+        {
+
+            if (patch_type_T[patchi] == 0)
+            {
+                const fvPatchScalarField& pcsi =
+                    this->Z_.boundaryField()[patchi];
+
+                const fvPatchScalarField& pcsiv2 =
+                    this->Zvar_.boundaryField()[patchi];
+                
+                const fvPatchScalarField& pchi_st =
+                    this->chi_st_.boundaryField()[patchi];
+
+                const fvPatchScalarField& ph =
+                    this->H_.boundaryField()[patchi];
+
+                fvPatchScalarField& prho =
+                    this->density_reynolds_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& pmu =
+                    this->mu_favre_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& palpha =
+                    this->alpha_favre_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& pas =
+                    this->as_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& pt = this->T_.boundaryFieldRef()[patchi];
+
+                forAll(pcsi, facei)
+                {
+
+                    double max_chi = max(small_chi_st, pchi_st[facei]);
+
+                    defect =
+                        ph[facei] - (HOxidizer+pcsi[facei]*(HFuel-HOxidizer));
+
+                    //- Pure oxidizer
+                    if (pcsi[facei]<=0.)
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            0.,
+                            0.,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+
+                    //- Pure fuel
+                    else if (pcsi[facei]>=1.)
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            1.,
+                            0.,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+
+                    //- Mixture
+                    else
+                    {
+                        Zvar_normalized
+                            = pcsiv2[facei] / (pcsi[facei]*(1.-pcsi[facei]));
+
+                        if (Zvar_normalized >= 0.98)
+                        {
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                0.98,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                        else if (Zvar_normalized < 0.)
+                        {
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                0.00,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                        else
+                        {
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                Zvar_normalized,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                    }
+
+                    pt[facei] = extracted[1];
+                    
+                    prho[facei] = extracted[2];
+                    
+                    pas[facei] = extracted[3];
+
+                    pmu[facei] = extracted[4];
+                    
+                    palpha[facei] = extracted[5];
+                }
+            }
+
+            //- Added for friendly handling
+            //- fixed temperature and fixed enhalpy :: INLETS
+            else if 
+            (
+                patch_type_T[patchi] == 1
+             && patch_type_H[patchi] == 1
+             && patch_type_Z[patchi] == 1
+            )
+            {
+                const fvPatchScalarField& pcsi
+                    = this->Z_.boundaryField()[patchi];
+
+                const fvPatchScalarField& pcsiv2
+                    = this->Zvar_.boundaryField()[patchi];
+
+                const fvPatchScalarField& pchi_st
+                    = this->chi_st_.boundaryField()[patchi];
+
+                fvPatchScalarField& prho
+                    = this->density_reynolds_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& pas
+                    = this->as_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& pmu
+                    = this->mu_favre_.boundaryFieldRef()[patchi];
+
+                fvPatchScalarField& palpha
+                    = this->alpha_favre_.boundaryFieldRef()[patchi];
+
+                forAll(pcsi, facei)
+                {
+                    defect = 0.;
+
+                    double max_chi = max(small_chi_st, pchi_st[facei]);
+
+                    //- Pure oxidizer
+                    if (pcsi[facei]<=0.)
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            0.,
+                            0.,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+
+                    //- Pure fuel
+                    else if (pcsi[facei]>=1.)
+                    {
+                        flamelets_library.GetMeanValues
+                        (
+                            1.,
+                            0.,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+
+                    //- Mixture
+                    else
+                    {
+                        Zvar_normalized
+                            = pcsiv2[facei] / (pcsi[facei]*(1.-pcsi[facei]));
+
+                        if (Zvar_normalized >= 0.98)
+                        {
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                0.98,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                        else if (Zvar_normalized < 0.)
+                        {
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                0.00,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                        else
+                        {
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                Zvar_normalized,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                    }
+
+                    prho[facei] = extracted[2];
+
+                    pas[facei] = extracted[3];
+
+                    pmu[facei] = extracted[4];
+
+                    palpha[facei] = extracted[5];
+                }
+            }
+
+            //- Added for enthalpydefect due to fixedTemperature on walls
+            //- fixed temperature and fixedEnthalpie :: no inlet
+            else if
+            (
+                patch_type_T[patchi] == 1
+             && patch_type_H[patchi] == 1
+             && patch_type_Z[patchi] == 0
+            )
+            {
+
+                const fvPatchScalarField& pcsi
+                    = this->Z_.boundaryField()[patchi];
+
+                const fvPatchScalarField& pcsiv2
+                    = this->Zvar_.boundaryField()[patchi];
+
+                const fvPatchScalarField& pchi_st
+                    = this->chi_st_.boundaryField()[patchi];
+
+                fvPatchScalarField& ph
+                    = this->H_.boundaryField()[patchi];
+
+                fvPatchScalarField& pt
+                    = this->T_.boundaryField()[patchi];
+
+                fvPatchScalarField& prho
+                    = this->density_reynolds_.boundaryField()[patchi];
+
+                fvPatchScalarField& pas
+                    = this->as_.boundaryField()[patchi];
+
+                fvPatchScalarField& pmu
+                    = this->mu_favre_.boundaryField()[patchi];
+
+                fvPatchScalarField& palpha
+                    = this->alpha_favre_.boundaryField()[patchi];
+
+                forAll(pcsi, facei)
+                {
+
+                    scalar max_chi = max(small_chi_st, pchi_st[facei]);
+
+                    //- Pure oxidizer
+                    if (pcsi[facei]<=0.)
+                    {
+                        defect =
+                            flamelets_library.GetEnthalpyDefectFromTemperature
+                                (
+                                    0.,
+                                    0.,
+                                    max_chi,
+                                    pt[facei]
+                                );
+
+                        ph[facei] = defect + HOxidizer;
+
+                        flamelets_library.GetMeanValues
+                        (
+                            0.,
+                            0.,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+
+                    //- Pure fuel
+                    else if (pcsi[facei]>=1.)
+                    {
+                        defect = 
+                            flamelets_library.GetEnthalpyDefectFromTemperature
+                            (
+                                1.,
+                                0.,
+                                max_chi,
+                                pt[facei]
+                            );
+
+                        ph[facei] = defect + HFuel;
+
+                        flamelets_library.GetMeanValues
+                        (
+                            1.,
+                            0.,
+                            max_chi,
+                            defect,
+                            extracted
+                        );
+                    }
+
+                    //- Mixture
+                    else
+                    {
+                        Zvar_normalized =
+                            pcsiv2[facei] / (pcsi[facei]*(1.-pcsi[facei]));
+
+                        if (Zvar_normalized >= 0.98)
+                        {
+                            defect =
+                                flamelets_library.GetEnthalpyDefectFromTemperature
+                                (
+                                    pcsi[facei],
+                                    0.98,
+                                    max_chi,
+                                    pt[facei]
+                                );
+
+                            ph[facei] =
+                                defect
+                              + (HOxidizer+pcsi[facei]*(HFuel-HOxidizer));
+
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                0.98,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                        else if (Zvar_normalized < 0.)
+                        {
+                            defect =
+                                flamelets_library.GetEnthalpyDefectFromTemperature
+                                (
+                                    pcsi[facei],
+                                    0.00,
+                                    max_chi,
+                                    pt[facei]
+                                );
+
+                            ph[facei] = 
+                                defect
+                              + (HOxidizer+pcsi[facei]*(HFuel-HOxidizer));
+
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                0.00,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                        else
+                        {
+                            defect =
+                                flamelets_library.GetEnthalpyDefectFromTemperature
+                                (
+                                    pcsi[facei],
+                                    Zvar_normalized,
+                                    max_chi,
+                                    pt[facei]
+                                );
+
+                            ph[facei] =
+                                defect
+                              + (HOxidizer+pcsi[facei]*(HFuel-HOxidizer));
+
+                            flamelets_library.GetMeanValues
+                            (
+                                pcsi[facei],
+                                Zvar_normalized,
+                                max_chi,
+                                defect,
+                                extracted
+                            );
+                        }
+                    }
+
+                    prho[facei] = extracted[2];
+
+                    pas[facei] = extracted[3];
+
+                    pmu[facei] = extracted[4];
+
+                    palpha[facei] = extracted[5];
+                }
+            }
+
+            //- Not implemented boundary condition :: give an error
+            else
+            {
+                FatalErrorIn
+                (
+                    "pdfFlameletThermo<BasicFlameletThermo, MixtureType>::update()"
+                )
+                << "Boundary conditions are wrong: "
+                << "fixed temperature BC must be fixed enthaplie BC with value 0;"
+                << abort(FatalError);
+            }
+        }
+    }
+}
+
+template<class BasicFlameletThermo, class MixtureType>
+void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::
+updateMassFractions()
+{
+    std::vector<scalar> extracted(flamelets_library.number_of_species()+1);
+
+    double Zvar_normalized = 0.;
+
+    double defect = 0.;
+
+    const scalarField& Z = this->Z_.internalField();
+
+    const scalarField& Zvar = this->Zvar_.internalField();
+
+    const scalarField& chi_st = this->chi_st_.internalField();
+
+    const scalarField& HCells = this->H_.internalField();
+
+    double small_eps = 1.e-6;
+
+    double small_chi_st = 1.e-8;
+
+    forAll(Z, celli)
+    {
+        double max_chi = max(small_chi_st,chi_st[celli]);
+
+        if (adiabaticMode == false)
+        {
+            defect = HCells[celli] - (HOxidizer+Z[celli]*(HFuel-HOxidizer));
+        }
+
+        //- Pure oxidizer
+        if (Z[celli]<=small_eps)
+        {
+            flamelets_library.ExtractMeanValues
+            (
+                0.,
+                0.,
+                max_chi,
+                defect,
+                extracted
+            );
+        }
+
+        //- Pure fuel
+        else if (Z[celli]>=(1.-small_eps))
+        {
+            flamelets_library.ExtractMeanValues
+            (
+                1.,
+                0.,
+                max_chi,
+                defect,
+                extracted
+            );
+        }
+
+        //- Mixture
+        else
+        {
+            Zvar_normalized = Zvar[celli] / (Z[celli]*(1.-Z[celli]));
+
+            if (Zvar_normalized >= 0.98)
+            {
+                flamelets_library.ExtractMeanValues
+                (
+                    Z[celli],
+                    0.98,
+                    max_chi,
+                    defect,
+                    extracted
+                );
+            }
+            else if (Zvar_normalized < 0.)
+            {
+                flamelets_library.ExtractMeanValues
+                (
+                    Z[celli],
+                    0.00,
+                    max_chi,
+                    defect,
+                    extracted
+                );
+            }
+            else
+            {
+                flamelets_library.ExtractMeanValues
+                (
+                    Z[celli],
+                    Zvar_normalized,
+                    max_chi,
+                    defect,
+                    extracted
+                );
+            }
+        }
+
+        for(int j=0;j<flamelets_library.number_of_species()+1;j++)
+        {
+            if(j<flamelets_library.number_of_species())
+            {
+                omega_[j].internalField()[celli] = extracted[j+1];
+            }
+        }
+    }
+
+    forAll(Z_.boundaryField(), patchi)
+    {
+        const fvPatchScalarField& pZ = this->Z_.boundaryField()[patchi];
+        
+        const fvPatchScalarField& pZvar = this->Zvar_.boundaryField()[patchi];
+
+        const fvPatchScalarField& ph = this->H_.boundaryField()[patchi];
+
+        const fvPatchScalarField& pchi_st =
+            this->chi_st_.boundaryField()[patchi];
+
+        forAll(pZ, facei)
+        {
+
+            double max_chi = max(small_chi_st, pchi_st[facei]);
+
+            if (adiabaticMode == false)
+                defect = ph[facei] - (HOxidizer+pZ[facei]*(HFuel-HOxidizer));
+
+            //- Pure oxidizer
+            if (pZ[facei]<=small_eps)
+            {
+                flamelets_library.ExtractMeanValues
+                (
+                    0.,
+                    0., 
+                    max_chi, 
+                    defect, 
+                    extracted
+                );
+            }
+
+            //- Pure fuel
+            else if (pZ[facei]>=(1.-small_eps))
+            {
+                flamelets_library.ExtractMeanValues
+                (
+                    1., 
+                    0., 
+                    max_chi, 
+                    defect, 
+                    extracted
+                );
+            }
+
+            //- Mixture
+            else
+            {
+                Zvar_normalized = pZvar[facei] / (pZ[facei]*(1.-pZ[facei]));
+
+                if (Zvar_normalized >= 0.98)
+                {
+                    flamelets_library.ExtractMeanValues
+                    (
+                        pZ[facei], 
+                        0.98, 
+                        max_chi, 
+                        defect, 
+                        extracted
+                    );
+                }
+                else if (Zvar_normalized < 0.)
+                {
+                    flamelets_library.ExtractMeanValues
+                    (
+                        pZ[facei], 
+                        0.00, 
+                        max_chi, 
+                        defect, 
+                        extracted
+                   );
+                }
+                else
+                {
+                    flamelets_library.ExtractMeanValues
+                    (
+                        pZ[facei], 
+                        Zvar_normalized, 
+                        max_chi,
+                        defect, 
+                        extracted
+                    );
+                }
+            }
+
+            for(int j=0;j<flamelets_library.number_of_species()+1;j++)
+            {
+                if(j<flamelets_library.number_of_species())
+                {
+                    omega_[j].boundaryField()[patchi][facei] = extracted[j+1];
+                }
+            }
+        }
+    }
+}
+
+
+
+template<class BasicFlameletThermo, class MixtureType>
+void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::
+errorMessage(const string message)
+{
+    Info << "Class: pdfFlameletThermo" << endl;
+    Info << "Error: " << message << endl;
+    getchar();
+}
+
+template<class BasicFlameletThermo, class MixtureType>
+void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::infoMessage() const
+{
+    Info << "/*-------------------------------------*\\\n"
+         << "|    Flamelet Thermo initialization     |\n"
+         << "|                                       |\n"
+         << "|   Rebuild by Tobias Holzmann M.Eng.   |\n"
+         << "|          www.Holzmann-cfd.de          |\n"
+         << "\\*-------------------------------------*/\n"
+         << endl;
 }
 
 
@@ -132,9 +1019,363 @@ Foam::pdfFlameletThermo<BasicPsiThermo, MixtureType>::pdfFlameletThermo
     const word& phaseName
 )
 :
-    heThermo<BasicPsiThermo, MixtureType>(mesh, phaseName)
+    heThermo<BasicPsiThermo, MixtureType>(mesh, phaseName),
+
+    Z_
+    (
+        IOobject
+        (
+            "Z",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    ),
+
+    Zvar_
+    (
+        IOobject
+        (
+            "Zvar",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    ),
+
+    chi_st_
+    (
+        IOobject
+        (
+            "chi_st",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("chi_st",dimensionSet(0,0,-1,0,0,0,0) , 0.0)
+    ),
+
+    H_
+    (
+        IOobject
+        (
+            "H",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    ),
+
+    defect_
+    (
+        IOobject
+        (
+            "defect",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("defect",dimensionSet(0,2,-2,0,0,0,0) , 0.0)
+    ),
+
+    as_
+    (
+        IOobject
+        (
+            "as",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("as",dimensionSet(0,-1,0,0,0,0,0) , 0.0)
+    ),
+
+    density_reynolds_
+    (
+        IOobject
+        (
+            "rho_reynolds",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("density_reynolds",dimensionSet(1,-3,0,0,0,0,0) , 0.0)
+    ),
+
+    mu_favre_
+    (
+        IOobject
+        (
+            "mu_lam",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("mu_lam",dimensionSet(1,-1,-1,0,0,0,0) , 0.0)
+    ),
+
+    alpha_favre_
+    (
+        IOobject
+        (
+            "alpha_lam",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("alpha_lam",dimensionSet(0,2,-1,0,0,0,0) , 0.0)
+    ),
+
+    adiabaticMode(false),
+    showFlamelet(false),
+    showFlameletLibrary(false)
 {
+    //- Info message
+    infoMessage();
+
+    //- Get fixedValue enthalpy boundarys
+    Info << "Enthalpy:" << endl;
+
+    forAll(this->H_.boundaryField(), patchi)
+    {
+        if (isA<fixedValueFvPatchScalarField>(this->H_.boundaryField()[patchi]))
+        {
+            Info<< "     + " << mesh.boundary()[patchi].name()
+                << " <fixedValue>" << endl;
+            patch_type_H.append(1);
+        }
+        else
+        {
+            Info<< "     + " << mesh.boundary()[patchi].name()
+                << "" << endl;
+            patch_type_H.append(0);
+        }
+    }
+
+    //- Get fixedValue temperatur boundarys
+    Info << endl << "Temperature: " << endl;
+    forAll(this->T_.boundaryField(), patchi)
+    {
+        if (isA<fixedValueFvPatchScalarField>(this->T_.boundaryField()[patchi]))
+        {
+            Info<< "     + " << mesh.boundary()[patchi].name()
+                << " <fixedValue>" << endl;
+            patch_type_T.append(1);
+        }
+        else
+        {
+            Info << "     + " << mesh.boundary()[patchi].name() << "" << endl;
+            patch_type_T.append(0);
+        }
+    }
+
+    //- Get fuel and oxidizer inlets
+    Info << endl << "Mixture fraction:" << endl;
+    forAll(this->Z_.boundaryField(), patchi)
+    {
+        if (isA<fixedValueFvPatchScalarField>(this->Z_.boundaryField()[patchi]))
+        {
+            Info << "     + " << mesh.boundary()[patchi].name()
+                << " <fixedValue>" << endl;
+            patch_type_Z.append(1);
+        }
+        else
+        {
+            Info << "     + " << mesh.boundary()[patchi].name() << "" << endl;
+            patch_type_Z.append(0);
+        }
+    }
+    Info << endl;
+
+    //- IOFlamelet properties
+    IOdictionary flameletsProperties_
+    (
+        IOobject
+        (
+            "flameletsProperties",
+            Z_.time().constant(),
+            Z_.db(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    );
+
+    //- Get flamelet properties and set fields and variables
+    {
+        Switch adiabaticMode_(flameletsProperties_.lookup("adiabaticMode"));
+        Switch showFlamelet_(flameletsProperties_.lookup("showFlamelet"));
+        Switch showFlameletLibrary_
+        (
+            flameletsProperties_.lookup("showFlameletLibrary")
+        );
+        propertyUpdate =
+            readLabel(flameletsProperties_.lookup("propertyUpdate"));
+
+        massFractionsUpdate =
+            readLabel(flameletsProperties_.lookup("massFractionsUpdate"));
+
+        adiabaticMode = adiabaticMode_;
+        showFlamelet = showFlamelet_;
+        showFlameletLibrary = showFlameletLibrary_;
+        counter = propertyUpdate;
+        counter_mass_fractions = massFractionsUpdate;
+
+        string libraryPath = flameletsProperties_.lookup("libraryPath");
+        string chiPDF = flameletsProperties_.lookup("pdf");
+        string list_of_species = flameletsProperties_.lookup("species");
+
+        flamelets_library.SetLibraryPath(libraryPath);
+        flamelets_library.SetSpeciesToExtract(list_of_species);
+
+        //- Set the dissipation mode
+
+            //- Set adiabatic mode
+            if (adiabaticMode == true)
+            {
+                Info << "Flamelet thermo mode is <adiabatic>" << endl;
+                flamelets_library.SetAdiabaticMode();
+            }
+            else
+            {
+                Info << "Flamelet thermo mode is <non-adiabatic>" << endl;
+            }
+
+            //- Scalar dissipation rate distribution
+            if (chiPDF == "logNormal")
+            {
+                Info<< "Flamelet thermo use the <log-normal distribution> "
+                    << "for the scalar dissipation rate" << endl;
+
+                scalar chi_sigma
+                (
+                    readScalar(flameletsProperties_.lookup("sigma"))
+                );
+
+                label chi_points
+                (
+                    readScalar(flameletsProperties_.lookup("points"))
+                );
+
+                flamelets_library.UnsetExcludeColdFlamelets();
+                flamelets_library.SetLogNormalChiDistribution
+                (
+                    chi_sigma,
+                    chi_points
+                );
+            }
+            else if (chiPDF == "dirac")
+            {
+                Info<< "Flamelet thermo uses the <delta-dirac distribution> "
+                    << "for the scalar dissipation rate" << endl;
+            }
+
+            //- Set show flamelet mode
+            if (showFlamelet == true)
+            {
+                Info<< "Flamelet thermo shows all single flamelet properties"
+                    << endl;
+
+                flamelets_library.SetShowFlamelet();
+            }
+            else
+            {
+                Info<< "Flamelet thermo does not show the single "
+                    << "flamelet properties" << endl;
+            }
+
+            //- Set show flamelet library mode
+            if (showFlameletLibrary == true)
+            {
+                Info<< "Flamelet thermo shows all flamelet library properties"
+                    << endl;
+
+                flamelets_library.SetShowFlameletLibrary();
+            }
+            else
+            {
+                Info<< "Flamelet thermo does not show the flamelet "
+                    << "library properties" << endl;
+            }
+
+
+        //- Initialise the wanted mass fraction fields
+        omega_.setSize(flamelets_library.number_of_species()+1);
+
+        for (int j=0;j<flamelets_library.number_of_species()+1;j++)
+        {
+            if(j < flamelets_library.number_of_species())
+            {
+                word name_of_species =
+                    "omega_" + flamelets_library.species()[j+1];
+
+                omega_.set
+                (
+                    j,
+                    new volScalarField
+                    (
+                        IOobject
+                        (
+                            name_of_species,
+                            mesh.time().timeName(),
+                            mesh,
+                            IOobject::NO_READ,
+                            IOobject::AUTO_WRITE
+                        ),
+                        mesh,
+                        dimensionedScalar
+                        (
+                            "zero",
+                            dimensionSet(0,0,0,0,0,0,0),
+                            scalar(0.0)
+                        )
+                    )
+                );
+            }
+        }
+    }
+
+    //- Read all flamelets
+    flamelets_library.Read();
+    flamelets_library.Summary();
+
+    //- Set the adiabat enthalpy
+    Info<< "Thermo flamelet set the adiabat enthalpy for enthalpy "
+        << "defect calculation:\n" << endl;
+    {
+        HOxidizer = flamelets_library.enthalpy_f_oxidizer();
+        HFuel = flamelets_library.enthalpy_f_fuel();
+
+        Info<< "     + Adiabat enthalpy fuel: " << HFuel << endl;
+        Info<< "     + Adiabat enthalpy oxidizer: " << HOxidizer << "\n"
+            << endl;
+    }
+
+    //- Extract all variables
+    //update();
+
+    //- Calculate first time
     calculate();
+
+    // Switch on saving old time
+    this->psi_.oldTime();
 }
 
 

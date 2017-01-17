@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  4.x                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -34,11 +34,11 @@ boundaryField
     "outlet|sidewall"
     {
         type            totalPressure;
-	p0		$internalField;
-	phi		phi;
-	U		U;
-	psi		none;
-	gamma		0;
+        p0              $internalField;
+        phi             phi;
+        U               U;
+        psi             none;
+        gamma           0;
         value           $internalField;
     }
 

@@ -51,9 +51,11 @@ int main(int argc, char *argv[])
     #include "createFieldRefs.H"
     #include "readMassFlowProperties.H"
     #include "createFvOptions.H"
+    Info<< "Foobar" << endl;
     #include "initContinuityErrs.H"
+    Info<< "Foobar 2 " << endl;
 
-    turbulence->validate();
+    //turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
