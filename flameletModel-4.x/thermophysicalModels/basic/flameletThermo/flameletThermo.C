@@ -39,19 +39,6 @@ namespace Foam
 Foam::flameletThermo::flameletThermo(const fvMesh& mesh, const word& phaseName)
 :
     fluidThermo(mesh, phaseName),
-    /*rho_
-    (
-        IOobject
-        (
-            phasePropertyName("thermo:rho"),
-            mesh.time().timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimDensity
-    ),*/
 
     psi_
     (
@@ -82,58 +69,6 @@ Foam::flameletThermo::flameletThermo(const fvMesh& mesh, const word& phaseName)
     )
 {}
 
-
-/*Foam::flameletThermo::flameletThermo
-(
-    const fvMesh& mesh,
-    const dictionary& dict,
-    const word& phaseName
-)
-:
-    fluidThermo(mesh, dict, phaseName),
-    rho_
-    (
-        IOobject
-        (
-            phasePropertyName("thermo:rho"),
-            mesh.time().timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimDensity
-    ),
-
-    psi_
-    (
-        IOobject
-        (
-            phasePropertyName("thermo:psi"),
-            mesh.time().timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimensionSet(0, -2, 2, 0, 0)
-    ),
-
-    mu_
-    (
-        IOobject
-        (
-            phasePropertyName("thermo:mu"),
-            mesh.time().timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimensionSet(1, -1, -1, 0, 0)
-    )
-{}
-*/
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
@@ -161,11 +96,13 @@ Foam::volScalarField& Foam::flameletThermo::Z()
     return const_cast<volScalarField&>(volScalarField::null());
 }
 
+
 const Foam::volScalarField& Foam::flameletThermo::Z() const
 {
     notImplemented("flameletThermo::Z() const");
     return volScalarField::null();
 }
+
 
 Foam::volScalarField& Foam::flameletThermo::Zvar()
 {
@@ -173,11 +110,13 @@ Foam::volScalarField& Foam::flameletThermo::Zvar()
     return const_cast<volScalarField&>(volScalarField::null());
 }
 
+
 const Foam::volScalarField& Foam::flameletThermo::Zvar() const
 {
     notImplemented("flameletThermo::Zvar() const");
     return volScalarField::null();
 }
+
 
 Foam::volScalarField& Foam::flameletThermo::chi_st()
 {
@@ -185,11 +124,13 @@ Foam::volScalarField& Foam::flameletThermo::chi_st()
     return const_cast<volScalarField&>(volScalarField::null());
 }
 
+
 const Foam::volScalarField& Foam::flameletThermo::chi_st() const
 {
     notImplemented("flameletThermo::chi_st() const");
     return volScalarField::null();
 }
+
 
 Foam::volScalarField& Foam::flameletThermo::H()
 {
@@ -197,11 +138,13 @@ Foam::volScalarField& Foam::flameletThermo::H()
     return const_cast<volScalarField&>(volScalarField::null());
 }
 
+
 const Foam::volScalarField& Foam::flameletThermo::H() const
 {
     notImplemented("flameletThermo::H() const");
     return volScalarField::null();
 }
+
 
 Foam::volScalarField& Foam::flameletThermo::as()
 {
@@ -209,41 +152,24 @@ Foam::volScalarField& Foam::flameletThermo::as()
     return const_cast<volScalarField&>(volScalarField::null());
 }
 
+
 const Foam::volScalarField& Foam::flameletThermo::as() const
 {
     notImplemented("flameletThermo::as() const");
     return volScalarField::null();
 }
 
-Foam::volScalarField& Foam::flameletThermo::rho()
-{
-    notImplemented("flameletThermo::rho()");
-    return const_cast<volScalarField&>(volScalarField::null());
-}
 
-const Foam::volScalarField& Foam::flameletThermo::rho() const
+Foam::tmp<Foam::volScalarField> Foam::flameletThermo::rho() const
 {
-    notImplemented("flameletThermo::rho() const");
-    return volScalarField::null();
-}
-
-/*Foam::tmp<Foam::volScalarField> Foam::flameletThermo::rho() const
-{
-    return rho_;
+    return p_*psi_;
 }
 
 
 Foam::tmp<Foam::scalarField> Foam::flameletThermo::rho(const label patchi) const
 {
-    return rho_.boundaryField()[patchi];
+    return p_.boundaryField()[patchi]*psi_.boundaryField()[patchi];
 }
-
-
-Foam::volScalarField& Foam::flameletThermo::rho()
-{
-    Info<< "Return rho" << endl;
-    return rho_;
-}*/
 
 
 const Foam::volScalarField& Foam::flameletThermo::psi() const

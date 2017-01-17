@@ -2,8 +2,6 @@
 
     MRF.correctBoundaryVelocity(U);
 
-    Info<< rho << endl;
-
     tmp<fvVectorMatrix> tUEqn
     (
         fvm::div(phi, U)

@@ -1,6 +1,9 @@
 #vim swap and gedit
 *~
 *swp
+lnInclude
+polyMesh
+linux*
 
 #FOAM files
 dependencies

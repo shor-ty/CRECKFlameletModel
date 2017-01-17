@@ -23,33 +23,23 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "flameletThermo.H"
-#include "makeThermo.H"
-
-#include "specie.H"
-#include "perfectGas.H"
-#include "incompressiblePerfectGas.H"
-#include "Boussinesq.H"
-#include "rhoConst.H"
-#include "perfectFluid.H"
-#include "PengRobinsonGas.H"
-#include "adiabaticPerfectFluid.H"
-
-#include "hConstThermo.H"
-#include "janafThermo.H"
-#include "sensibleEnthalpy.H"
-#include "sensibleInternalEnergy.H"
-#include "thermo.H"
-
-#include "constTransport.H"
-#include "sutherlandTransport.H"
-
-#include "icoPolynomial.H"
-#include "hPolynomialThermo.H"
-#include "polynomialTransport.H"
-
-#include "pdfFlameletThermo.H"
-#include "pureMixture.H"
+#include "flameletThermo.H"                                                     
+#include "makeThermo.H"                                                         
+                                                                                
+#include "specie.H"                                                             
+#include "perfectGas.H"                                                         
+#include "hConstThermo.H"                                                       
+#include "eConstThermo.H"                                                       
+#include "janafThermo.H"                                                        
+#include "sensibleEnthalpy.H"                                                   
+#include "sensibleInternalEnergy.H"                                             
+#include "thermo.H"                                                             
+                                                                                
+#include "constTransport.H"                                                     
+#include "sutherlandTransport.H"                                                
+                                                                                
+#include "pdfFlameletThermo.H"                                                  
+#include "pureMixture.H"    
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

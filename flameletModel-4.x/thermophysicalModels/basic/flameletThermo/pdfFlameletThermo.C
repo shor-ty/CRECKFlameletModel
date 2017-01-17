@@ -609,22 +609,22 @@ void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::update()
                     = this->chi_st_.boundaryField()[patchi];
 
                 fvPatchScalarField& ph
-                    = this->H_.boundaryField()[patchi];
+                    = this->H_.boundaryFieldRef()[patchi];
 
                 fvPatchScalarField& pt
-                    = this->T_.boundaryField()[patchi];
+                    = this->T_.boundaryFieldRef()[patchi];
 
                 fvPatchScalarField& prho
-                    = this->density_reynolds_.boundaryField()[patchi];
+                    = this->density_reynolds_.boundaryFieldRef()[patchi];
 
                 fvPatchScalarField& pas
-                    = this->as_.boundaryField()[patchi];
+                    = this->as_.boundaryFieldRef()[patchi];
 
                 fvPatchScalarField& pmu
-                    = this->mu_favre_.boundaryField()[patchi];
+                    = this->mu_favre_.boundaryFieldRef()[patchi];
 
                 fvPatchScalarField& palpha
-                    = this->alpha_favre_.boundaryField()[patchi];
+                    = this->alpha_favre_.boundaryFieldRef()[patchi];
 
                 forAll(pcsi, facei)
                 {
@@ -774,10 +774,12 @@ void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::update()
             {
                 FatalErrorIn
                 (
-                    "pdfFlameletThermo<BasicFlameletThermo, MixtureType>::update()"
+                    "pdfFlameletThermo<BasicFlameletThermo,"
+                    "MixtureType>::update()"
                 )
                 << "Boundary conditions are wrong: "
-                << "fixed temperature BC must be fixed enthaplie BC with value 0;"
+                << "fixed temperature BC must be fixed "
+                << "enthaplie BC with value 0;"
                 << abort(FatalError);
             }
         }
@@ -885,7 +887,7 @@ updateMassFractions()
         {
             if(j<flamelets_library.number_of_species())
             {
-                omega_[j].internalField()[celli] = extracted[j+1];
+                omega_[j].ref()[celli] = extracted[j+1];
             }
         }
     }
@@ -979,7 +981,8 @@ updateMassFractions()
             {
                 if(j<flamelets_library.number_of_species())
                 {
-                    omega_[j].boundaryField()[patchi][facei] = extracted[j+1];
+                    omega_[j].boundaryFieldRef()[patchi][facei] =
+                        extracted[j+1];
                 }
             }
         }
@@ -998,7 +1001,8 @@ errorMessage(const string message)
 }
 
 template<class BasicFlameletThermo, class MixtureType>
-void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::infoMessage() const
+void Foam::pdfFlameletThermo<BasicFlameletThermo, MixtureType>::
+infoMessage() const
 {
     Info << "/*-------------------------------------*\\\n"
          << "|    Flamelet Thermo initialization     |\n"
@@ -1369,7 +1373,7 @@ Foam::pdfFlameletThermo<BasicPsiThermo, MixtureType>::pdfFlameletThermo
     }
 
     //- Extract all variables
-    //update();
+    update();
 
     //- Calculate first time
     calculate();
@@ -1396,7 +1400,46 @@ void Foam::pdfFlameletThermo<BasicPsiThermo, MixtureType>::correct()
         InfoInFunction << endl;
     }
 
+    //- Force saving of the old-time values
+    this->psi_.oldTime();
+
+    if
+    (
+        counter == propertyUpdate
+     || counter_mass_fractions == massFractionsUpdate
+    )
+    {
+        Info<< "Flamelet thermo: \n";
+    }
+
+    if (counter == propertyUpdate)
+    {
+        Info<< "    + Flamelet thermo updates all thermo variables "
+            << "using the Look-Up-Table\n";
+
+        update();
+
+        counter = 0;
+    }
+
+    if (counter_mass_fractions == massFractionsUpdate)
+    {
+        Info<< "    + Flamelet thermo updates all mass fractions "
+            << " using the Look-Up-Table\n";
+
+        updateMassFractions();
+
+        counter_mass_fractions = 0;
+    }
+    else if (counter_mass_fractions != massFractionsUpdate && counter == 0)
+    {
+        Info<< "\n";
+    }
+        
     calculate();
+
+    ++counter;
+    ++counter_mass_fractions;
 
     if (debug)
     {
