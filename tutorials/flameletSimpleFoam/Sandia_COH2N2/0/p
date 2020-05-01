@@ -1,13 +1,13 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  4.x                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.2;
+    version     2.0;
     format      ascii;
     class       volScalarField;
     location    "0";
@@ -15,51 +15,53 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions          [ 1 -1 -2 0 0 0 0 ];
+dimensions      [1 -1 -2 0 0 0 0];
 
 internalField   uniform 101325;
 
 boundaryField
 {
-    inletfuel           
+    inletfuel
     {
         type            zeroGradient;
     }
-
-    inletair           
+    inletair
     {
         type            zeroGradient;
     }
-
-    "outlet|sidewall"
+    outlet
     {
         type            totalPressure;
-        p0              $internalField;
-        phi             phi;
-        U               U;
+        rho             rho;
         psi             none;
-        gamma           0;
-        value           $internalField;
+        gamma           1;
+        p0              uniform 101325;
+        value           uniform 101325;
     }
-
-    burnerwall       
-    {
-        type            zeroGradient;
-    }
-
-    front    
-    {
-        type            wedge;
-    }
-
-    back   
-    {
-        type            wedge;
-    }
-
     axis
     {
         type            empty;
+    }
+    sidewall
+    {
+        type            totalPressure;
+        rho             rho;
+        psi             none;
+        gamma           1;
+        p0              uniform 101325;
+        value           uniform 101325;
+    }
+    burnerwall
+    {
+        type            zeroGradient;
+    }
+    front
+    {
+        type            wedge;
+    }
+    back
+    {
+        type            wedge;
     }
 }
 

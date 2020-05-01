@@ -112,6 +112,12 @@ public:
 
         //- Fields comming with pdfThermo
 
+
+            //- Add the given density correction to the density field.
+            //  Used to update the density field following pressure solution.
+            //  For flameletThermo does nothing.
+            virtual void correctRho(const volScalarField& deltaRho);
+
             //- Mixture fraction [-] non-const
             virtual volScalarField& Z();
 

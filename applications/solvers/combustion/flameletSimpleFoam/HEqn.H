@@ -8,7 +8,7 @@
     	);
 
     	hEqn.relax();
-    	hEqn.solve(mesh.solver("H"));
+    	hEqn.solve("H");
     }
 
     else
@@ -31,7 +31,7 @@
     	);
 
     	hEqn.relax();
-    	hEqn.solve(mesh.solver("H"));
+    	hEqn.solve("H");
     }
 
     thermo.correct();

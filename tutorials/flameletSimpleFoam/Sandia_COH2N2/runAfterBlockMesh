@@ -1,2 +1,0 @@
-sed -e 61c'type wedge;' constant/polyMesh/boundary -i
-sed -e 67c'type wedge;' constant/polyMesh/boundary -i
