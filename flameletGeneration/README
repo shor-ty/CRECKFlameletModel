@@ -1,0 +1,19 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Readme                                                                                      	#
+# Tobias Holzmann         								      	#
+# 26.11.2012										      	#
+#											      	#	 
+# use ./runFlameletGeneration for automatic look-up-table generation with different enthalpy  	#
+# defects. Change and modify the files							      	#
+# 												#
+# Operations.inp										#
+# Data/Data.inp											#
+# Input/Input.inp										#
+# runFlameletGeneration.sh									#
+#												#
+# The settings you can make are in the user guide from alberto cuoci				#
+# If you wanna use other kinetics, just make a folder with the kinetics in it and rename the    #
+# kinetic variable in the runFlameletGeneration.sh file						#
+#												#
+# Important files has an backup "file.backup							#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
