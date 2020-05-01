@@ -1,0 +1,6 @@
+Common = src
+
+$(Common)/OpenSMOKE_ChiDistribution.C
+$(Common)/OpenSMOKE_External_Functions.C
+
+LIB = $(FOAM_USER_LIBBIN)/libOpenSMOKE_common
