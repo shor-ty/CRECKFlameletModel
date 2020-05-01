@@ -1,2 +1,4 @@
+COMMON=FOOAR
+
 EXE_INC = \
-    -I$(realpath ../../common/lnInclude)
+    -I../../common/lnInclude

@@ -7,7 +7,7 @@ fvScalarMatrix ZEqn
 
 ZEqn.relax();
 
-ZEqn.solve(mesh.solver("Z"));
+ZEqn.solve("Z");
 
 if (varianceEquation == false)
 {
@@ -24,7 +24,7 @@ if (varianceEquation == false)
 
     ZvarEqn.relax();
 
-    ZvarEqn.solve(mesh.solver("Zvar"));
+    ZvarEqn.solve("Zvar");
 }
 else
 {

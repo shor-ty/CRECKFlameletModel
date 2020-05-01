@@ -1,6 +1,6 @@
-##  Rebuild version of the flamelet model for OpenFOAM 7.x
+##  Rebuild of the steady-state laminar Flamelet Model for OpenFOAM 7.x
 
-The libraries you are using here are developed by Alberto Cuoci and his team. For more information have a look at the official website http://creckmodeling.chem.polimi.it/
+The libraries you are using here are developed by Alberto Cuoci and his team (CRECK Modeling group). For more information have a look at the official website http://creckmodeling.chem.polimi.it/
 
 ## Introduction
 
@@ -18,8 +18,8 @@ first try the following steps given above. If you do have any problems, feel fre
 ```bash
 cd $FOAM_RUN
 cd ../
-git clone https://github.com/shor-ty/CRECKFlameletModel.git
-cd flameletModel
+git clone https://github.com/shor-ty/CRECKFlameletModel.git CRECKFlameletModel
+cd CRECKFlameletModel
 git checkout master
 cd thermophysicalModels/flameletExtraction/common
 wmake libso

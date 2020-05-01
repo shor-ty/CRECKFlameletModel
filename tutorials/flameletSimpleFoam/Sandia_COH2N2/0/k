@@ -1,14 +1,14 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  4.x                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.2;
-    format      binary;
+    version     2.0;
+    format      ascii;
     class       volScalarField;
     location    "0";
     object      k;
@@ -23,47 +23,40 @@ boundaryField
 {
     inletfuel
     {
-        type         turbulentIntensityKineticEnergyInlet;
-        intensity    0.2;
-        value        uniform 346.56;
+        type            turbulentIntensityKineticEnergyInlet;
+        intensity       0.2;
+        value           uniform 346.56;
     }
-
     inletair
-    {   
-        type         turbulentIntensityKineticEnergyInlet;
-        intensity    0.05;
-        value        uniform 0.0021;
+    {
+        type            turbulentIntensityKineticEnergyInlet;
+        intensity       0.05;
+        value           uniform 0.0021;
     }
-
     outlet
     {
-        type         zeroGradient;
+        type            zeroGradient;
     }
-
     axis
     {
-        type         empty;
+        type            empty;
     }
-
     sidewall
     {
-        type         zeroGradient;
+        type            zeroGradient;
     }
-
     burnerwall
     {
-        type         kqRWallFunction;
-        value        uniform 0.0021;
+        type            kqRWallFunction;
+        value           uniform 0.0021;
     }
-
     front
     {
-        type         wedge;
+        type            wedge;
     }
-
     back
     {
-        type         wedge;
+        type            wedge;
     }
 }
 

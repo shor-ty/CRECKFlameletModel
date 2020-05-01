@@ -90,6 +90,10 @@ Foam::flameletThermo::~flameletThermo()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void Foam::flameletThermo::correctRho(const Foam::volScalarField& deltaRho)
+{}
+
+
 Foam::volScalarField& Foam::flameletThermo::Z()
 {
     notImplemented("flameletThermo::Z()");
