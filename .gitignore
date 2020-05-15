@@ -6,7 +6,6 @@
 dependencies
 dependencyFiles
 dontIncludeDeps
-files
 filesMacros
 includeDeps
 *.o
