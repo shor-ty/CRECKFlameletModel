@@ -4,12 +4,13 @@
 
 #FOAM files
 dependencies
-dependencyFiles  
-dontIncludeDeps  
-files  
-filesMacros  
-includeDeps  
-*.o  
-localObjectFiles  
-objectFiles   
+dependencyFiles
+dontIncludeDeps
+filesMacros
+includeDeps
+*.o
+localObjectFiles
+objectFiles
 sourceFiles
+linux64*
+lnInclude
