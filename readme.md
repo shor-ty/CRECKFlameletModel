@@ -45,23 +45,22 @@ cd ../../../../
 cp -r tutorials $FOAM_RUN/flameletTutorials
 ```
 
-
 ## Changes | Features | Documentation
 + Have a look into the documentation folder
 
 ## Important | Validation
 
-+ the rebuild flamelet model for OpenFOAM 7.x is not validated but the changes which had made in the thermodynamic should not change the results
-+ same library for as flameletModel-4.x
++ the rebuilt of the flamelet model for OpenFOAM v7 and v8 was not validated. Only the necessary class changes were performed in order to use the library for newer versions. Nevertheless, one should first countercheck the SANDIA flame tutorial with the measurment data to ensure correctness.
 
 ## Notice | Warranty
 + Not tested. No warranty of results and accuraty.
 
 ## Older versions
-+ the modified version of 4.x can be found within this repository
-+ the modified version of 2.3.x can be found within this repository
-+ the modified version of 2.2.x can be found within this repository
-+ the modified version of 2.1.x can be found within this repository
++ the modified version of 7.x can be found inside this repository
++ the modified version of 4.x can be found inside this repository
++ the modified version of 2.3.x can be found inside this repository
++ the modified version of 2.2.x can be found inside this repository
++ the modified version of 2.1.x can be found inside this repository
 + the origin version of 2.1.x can be found here: https://github.com/wyldckat/libOpenSMOKE
 + the origin version of 1.7.x can be found here: https://github.com/wyldckat/libOpenSMOKE
 
