@@ -1,10 +1,19 @@
-##  Rebuild of the steady-state laminar Flamelet Model for OpenFOAM 7.x
+##  Rebuild of the steady-state laminar Flamelet Model for OpenFOAM v8
 
 The libraries you are using here are developed by Alberto Cuoci and his team (CRECK Modeling group). For more information have a look at the official website http://creckmodeling.chem.polimi.it/
 
-## Introduction
+## Supported OpenFOAM versions
+ - OpenFOAM v8
+ - OpenFOAM v7
+ - OpenFOAM 4.x
+ - OpenFOAM 2.3.x
+ - OpenFOAM 2.2.x
+ - OpenFOAM 2.1.x
 
+## Introduction
 Tobias worked with that flamelet-tool over 8 month during his Master thesis in 2012 and analysed the whole thermo model and the flamelet extraction libraries. For that Tobias made some validations and compared the results with ANSYS-CFX and measurements. There are some "bugs" in the original version which are removed in this version. Furthermore, you can use the SIMPLEC algorithm for solving steady-state combustions and the PIMPLE algorithm for transient calculations.
+
+The library only contains a steady-state solver. If you create the transient one, feel free to make a push request.
 
 
 ## Discussion
@@ -12,14 +21,17 @@ A discussion can be followed here: http://www.cfd-online.com/Forums/openfoam-pro
 
 ## Compiling
 
-IN the documentation folder you will find a compilation instruction which should be valid for this version too. However, you should
-first try the following steps given above. If you do have any problems, feel free to mail to community@Holzmann-cfd.com.
+In the documentation folder you will find a compilation instruction which should be valid for this version too. However, you should
+first try the following steps given below. If you do have any problems, feel free to mail to community@Holzmann-cfd.com. The »master« branch represents the actual supported versions (here OpenFOAM v8).
 
 ```bash
 cd $FOAM_RUN
 cd ../
 git clone https://github.com/shor-ty/CRECKFlameletModel.git CRECKFlameletModel
 cd CRECKFlameletModel
+```
+Now, depending on your OpenFOAM version, you have to replace »master« with the branch that fits to you.
+```bash
 git checkout master
 cd thermophysicalModels/flameletExtraction/common
 wmake libso

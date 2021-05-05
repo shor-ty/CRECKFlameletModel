@@ -32,7 +32,8 @@ Description
 
 #include "fvCFD.H"
 #include "flameletThermo.H"
-#include "turbulentFluidThermoModel.H"
+#include "fluidThermoMomentumTransportModel.H"
+#include "fluidThermophysicalTransportModel.H"
 #include "simpleControl.H"
 #include "fvOptions.H"
 #include "OFstream.H"

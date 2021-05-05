@@ -23,45 +23,26 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "flameletThermo.H"                                                     
-#include "makeThermo.H"                                                         
-                                                                                
-#include "specie.H"                                                             
-#include "perfectGas.H"                                                         
-#include "hConstThermo.H"                                                       
-#include "eConstThermo.H"                                                       
-#include "janafThermo.H"                                                        
-#include "sensibleEnthalpy.H"                                                   
-#include "sensibleInternalEnergy.H"                                             
-#include "thermo.H"                                                             
-                                                                                
-#include "constTransport.H"                                                     
-#include "sutherlandTransport.H"                                                
-                                                                                
-#include "pdfFlameletThermo.H"                                                  
-#include "pureMixture.H"    
+#include "flameletThermo.H"
+#include "pdfFlameletThermo.H"
+#include "pureMixture.H"
+
+#include "forGases.H"
+#include "forLiquids.H"
+#include "forPolynomials.H"
+#include "forTabulated.H"
+#include "makeThermo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+    forGases(makeThermos, flameletThermo, pdfFlameletThermo, pureMixture);
+    forLiquids(makeThermos, flameletThermo, pdfFlameletThermo, pureMixture);
+    forPolynomials(makeThermos, flameletThermo, pdfFlameletThermo, pureMixture);
+    forTabulated(makeThermos, flameletThermo, pdfFlameletThermo, pureMixture);
 
-makeThermo
-(
-    flameletThermo,
-    pdfFlameletThermo,
-    pureMixture,
-    sutherlandTransport,
-    sensibleEnthalpy,
-    hConstThermo,
-    perfectGas,
-    specie
-);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+}
 
 // ************************************************************************* //
